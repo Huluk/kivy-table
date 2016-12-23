@@ -3,13 +3,11 @@ from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from kivy.properties import StringProperty, ObjectProperty, ListProperty
+from kivy.properties import StringProperty, ObjectProperty
 
 class TableColumn(Widget):
     title = StringProperty()
-    key = StringProperty()
     hint_text = StringProperty()
 
     def __init__(self, title, key, weight=1, hint_text='0'):
@@ -23,11 +21,15 @@ class TableColumn(Widget):
 
 
 class TableRow(BoxLayout):
-    def __init__(self, data, columns):
+    def __init__(self, table, index):
         super(TableRow, self).__init__(orientation='horizontal')
-        self.data = data
-        for col in columns:
+        self.table = table
+        self.index = index
+        for col in table.columns:
             self.add_widget(col.get_cell(self))
+
+    def data(self, key):
+        return self.table.rows[self.index][key]
 
 
 class TableCell(TextInput):
@@ -35,9 +37,9 @@ class TableCell(TextInput):
     column = ObjectProperty(None, True)
 
     def __init__(self, column, row):
-        self.row = row
         self.column = column
-        super(TableCell, self).__init__(text=str(row.data[column.key]))
+        self.row = row
+        super(TableCell, self).__init__(text=str(row.data(column.key)))
 
 
 class TableView(ScrollView):
@@ -58,9 +60,9 @@ class TableView(ScrollView):
         # TODO update existing rows
 
     def add_row(self, data):
-        row = TableRow(data, self.columns)
+        self.rows.append(data)
+        row = TableRow(self, len(self.rows)-1)
         self.layout.add_widget(row)
-        self.rows.append(row)
 
 class TableApp(App):
     def build(self):
