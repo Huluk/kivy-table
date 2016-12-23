@@ -1,0 +1,2 @@
+all:
+	kivy main.py

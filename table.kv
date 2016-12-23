@@ -1,0 +1,41 @@
+#:kivy 1.0.9
+
+<ScrollView>:
+    canvas:
+        Color:
+            rgb: 1, 0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<GridLayout>:
+    canvas:
+        Color:
+            rgb: 1, 1, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<BoxLayout>:
+    size_hint: 1, None
+    size: self.width, 30
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<TextInput>:
+    hint_text: '0' # for number fields only
+    multiline: False
+    write_tab: False
+    # TODO BorderImage doc
+    border: 1, 2, 1, 2
+
+<Label>:
+    color: 0, 0, 0, 1
+    padding: 30, 0
+    # fit text size to label size, wrap-around
+    text_size: root.width, None
+    size: self.texture_size
