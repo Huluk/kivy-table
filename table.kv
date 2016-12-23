@@ -16,7 +16,7 @@
             pos: self.pos
             size: self.size
 
-<BoxLayout>:
+<Row>:
     size_hint: 1, None
     size: self.width, 30
     canvas.before:
@@ -26,16 +26,10 @@
             pos: self.pos
             size: self.size
 
-<TextInput>:
-    hint_text: '0' # for number fields only
+<TableCell>:
+    size_hint: 1, 1 # TODO: column.size_x, 1
+    hint_text: self.column.hint_text
     multiline: False
     write_tab: False
-    # TODO BorderImage doc
+    # TODO read BorderImage doc for border values
     border: 1, 2, 1, 2
-
-<Label>:
-    color: 0, 0, 0, 1
-    padding: 30, 0
-    # fit text size to label size, wrap-around
-    text_size: root.width, None
-    size: self.texture_size
