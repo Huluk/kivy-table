@@ -10,14 +10,20 @@ class TableColumn(Widget):
     title = StringProperty()
     hint_text = StringProperty()
 
-    def __init__(self, title, key, weight=1, hint_text='0'):
+    # TODO different widths
+    def __init__(self, title, key,
+            update_function=(lambda row, new_value: None),
+            hint_text=''):
         self.title = title
         self.key = key
-        self.weight = weight
+        self.update_function = update_function
         self.hint_text = hint_text
 
     def get_cell(self, row):
         return TableCell(self, row)
+
+    def on_cell_edit(self, row, new_value):
+        self.update_function(row, new_value)
 
 
 class TableRow(BoxLayout):
@@ -31,6 +37,13 @@ class TableRow(BoxLayout):
     def data(self, key):
         return self.table.rows[self.index][key]
 
+    def set_data(self, key, value):
+        self.rows[self.index][key] = value
+
+    def update(self):
+        for cell in self.children:
+            cell.update()
+
 
 class TableCell(TextInput):
     row = ObjectProperty(None, True)
@@ -39,7 +52,14 @@ class TableCell(TextInput):
     def __init__(self, column, row):
         self.column = column
         self.row = row
-        super(TableCell, self).__init__(text=str(row.data(column.key)))
+        super(TableCell, self).__init__()
+        self.update()
+    
+    def update(self):
+        self.text = str(self.row.data(self.column.key))
+
+    def on_text_validate(self):
+        self.column.on_cell_edit(self.row, self.text)
 
 
 class TableView(ScrollView):
@@ -70,8 +90,8 @@ class TableApp(App):
         table = TableView(size=(500,320),
                 pos_hint={'x':0.1, 'center_y':.5})
         # columns
-        table.add_column(TableColumn("Col1", "1"))
-        table.add_column(TableColumn("Col2", "2"))
+        table.add_column(TableColumn("Col1", key="1", hint_text='0'))
+        table.add_column(TableColumn("Col2", key="2", hint_text='0'))
         # content
         for i in range(30):
             row = {'1': str(2*i+1), '2': str(2*i+0)}
