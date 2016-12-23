@@ -7,7 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty, ObjectProperty, ListProperty
 
-class Column(Widget):
+class TableColumn(Widget):
     title = StringProperty()
     key = StringProperty()
     hint_text = StringProperty()
@@ -22,9 +22,9 @@ class Column(Widget):
         return TableCell(self, row)
 
 
-class Row(BoxLayout):
+class TableRow(BoxLayout):
     def __init__(self, data, columns):
-        super(Row, self).__init__(orientation='horizontal')
+        super(TableRow, self).__init__(orientation='horizontal')
         self.data = data
         for col in columns:
             self.add_widget(col.get_cell(self))
@@ -49,20 +49,32 @@ class TableView(ScrollView):
                 size_hint=(None, None), width=size[0])
         self.layout.bind(width=self.setter('width')) # TODO test size changes
         self.layout.bind(minimum_height=self.layout.setter('height'))
-        # content
-        column = Column("Column", "1")
-        column2 = Column("Column", "2")
-        for i in range(30):
-            row = {'1': str(2*i+1), '2': str(2*i+0)}
-            row = Row(row, [column, column2])
-            self.layout.add_widget(row)
+        self.columns = []
+        self.rows = []
         self.add_widget(self.layout)
+
+    def add_column(self, column):
+        self.columns.append(column)
+        # TODO update existing rows
+
+    def add_row(self, data):
+        row = TableRow(data, self.columns)
+        self.layout.add_widget(row)
+        self.rows.append(row)
 
 class TableApp(App):
     def build(self):
         # create a default grid layout with custom width/height
-        return TableView(size=(500,320),
+        table = TableView(size=(500,320),
                 pos_hint={'x':0.1, 'center_y':.5})
+        # columns
+        table.add_column(TableColumn("Col1", "1"))
+        table.add_column(TableColumn("Col2", "2"))
+        # content
+        for i in range(30):
+            row = {'1': str(2*i+1), '2': str(2*i+0)}
+            table.add_row(row)
+        return table
 
 if __name__ == '__main__':
     TableApp().run()
