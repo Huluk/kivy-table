@@ -18,7 +18,7 @@
 
 <TableRow>:
     size_hint: 1, None
-    size: self.width, 30
+    size: self.width, 25
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -27,6 +27,7 @@
             size: self.size
 
 <TableCell>:
+    font_size: 14
     size_hint: 1, 1 # TODO: column.size_x, 1
     hint_text: self.column.hint_text
     multiline: False
