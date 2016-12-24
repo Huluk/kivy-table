@@ -12,7 +12,7 @@ class TableApp(App):
         table.add_column(TableColumn("Col2", key="2", hint_text='0'))
         # content
         for i in range(30):
-            row = {'1': str(2*i+1), '2': str(2*i+0)}
+            row = {'1': str(2*i+0), '2': str(2*i+1)}
             table.add_row(row)
         return table
 

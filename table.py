@@ -7,6 +7,12 @@ from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty, ObjectProperty
 
 class TableColumn(Widget):
+    '''
+    A column provides a shared method of cell construction,
+    data access, and data updates.
+    Assumes that underlying data is accessable via data[key].
+    ''' # TODO optionally print title in a header
+
     title = StringProperty()
     hint_text = StringProperty()
 
@@ -27,6 +33,9 @@ class TableColumn(Widget):
 
 
 class TableRow(BoxLayout):
+    '''
+    A layout which contains the row cells and pointers to the data.
+    '''
     def __init__(self, table, index):
         super(TableRow, self).__init__(orientation='horizontal')
         self.table = table
@@ -38,13 +47,20 @@ class TableRow(BoxLayout):
         return self.table.data_rows[self.index][key]
 
     def set_data(self, key, value):
-        self.data_rows[self.index][key] = value
+        self.table.data_rows[self.index][key] = value
 
     def update(self):
+        '''
+        Reload data for all cells.
+        '''
         for cell in self.children:
             cell.update()
 
     def move_focus(self, index_diff, column):
+        '''
+        Move focus from a cell in this row to the corresponding
+        cell in the row with index_diff offset to this row.
+        '''
         self.table.set_focus(self.index + index_diff, column)
 
     def focus_on_cell(self, column):
@@ -58,6 +74,10 @@ class TableRow(BoxLayout):
 
 
 class TableCell(TextInput):
+    '''
+    A single cell, formatted and updated according to column,
+    with data from row.
+    '''
     row = ObjectProperty(None, True)
     column = ObjectProperty(None, True)
 
@@ -71,18 +91,24 @@ class TableCell(TextInput):
         self.update()
     
     def update(self):
+        ''' Reset text to data from row '''
         self.text = str(self.row.data(self.column.key))
 
     def on_text_validate(self):
+        ''' Let column validate and possibly update the input '''
         self.column.on_cell_edit(self.row, self.text)
 
-    def on_focus(self, instance, value, *largs):
+    def on_focus(self, instance, value):
         if value:
             self.row.scroll_into_view()
         else:
             self.update()
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
+        '''
+        Check for special navigation keys, otherwise call super.
+        '''
+        # TODO is on_text_validate() called for tab and s-tab?
         if keycode[1] in self.MOVEMENT_KEYS:
             self.on_text_validate()
             self.focus = False
@@ -92,6 +118,12 @@ class TableCell(TextInput):
 
 
 class TableView(ScrollView):
+    '''
+    A scrollable table where each row corresponds to a data point
+    and each column to a specific attribute of the data points.
+    Currently, each attribute is an editable field.
+    '''
+    # TODO allow for different cell types, update doc
     # TODO overscroll background color
     def __init__(self, size, pos_hint):
         super(TableView, self).__init__(size_hint=(None, 1), size=size,
