@@ -108,7 +108,10 @@ class TableView(ScrollView):
 
     def add_column(self, column):
         self.columns.append(column)
-        # TODO update existing rows
+        # TODO test row update
+        for row in self.layout_rows:
+            # TODO update column widths
+            row.add_widget(column.get_cell(row))
 
     def add_row(self, data):
         self.data_rows.append(data)
